@@ -19,13 +19,12 @@
     //const fee=0.095
 
 
-
     function getRow(){//2 different types of css on stockx
     if ((document.getElementsByClassName("chakra-text css-rcp4jd")[0])){
         let row=(document.getElementsByClassName("chakra-text css-rcp4jd")[0]);
         return row
       }else{
-        console.log('else');
+        //console.log('else');
         let row=(document.getElementsByClassName("chakra-stack css-84zodg")[0]);
         return row
       }
@@ -46,16 +45,16 @@
         var leftFullWordIndex=rowValue.indexOf("Lowest Ask:");//find index of lowest ask, to cut just it
         rowValue=rowValue.slice(leftFullWordIndex,);
         var leftIndex=rowValue.indexOf('£');
-        rowValue=rowValue.slice(leftIndex+1,);//get just int, no matter is it 1-4 digit long
-        var wantedPrice=stockxRound(rowValue)-1
+        rowValue=rowValue.slice(leftIndex+1,);//get just int, no matter is it 1-4 digit long'
+        rowValue=rowValue.split('W')[0]//delete everything after
+        var wantedPrice=stockxRound(rowValue/1.05)-1
         return Math.trunc(wantedPrice);
     }
     function getPayout(wantedPrice){
         //let wantedPrice=getWantedPrice();//I ll just past it, there is no need to calculate it 2 times
         wantedPrice=Math.round(wantedPrice)//round it, because user input have to be intiger
         console.log((wantedPrice*fee).toFixed(2))
-        console.log((wantedPrice*fee).toFixed(2))
-        var possiblePayout=(wantedPrice-(wantedPrice*fee).toFixed(2)-(wantedPrice*0.03).toFixed(2)-4.31).toFixed(2)
+        var possiblePayout=(wantedPrice-(wantedPrice*fee).toFixed(2)-(wantedPrice*0.03).toFixed(2)-4.36).toFixed(2)
         return possiblePayout
     }
         function getDataTable(){
@@ -64,14 +63,20 @@
     }
     function checkSingleItemFunc(){
         var wantedPriceHTML = document.createElement("span");
-        var wantedPrice=getWantedPrice();
-        var row=getRow();
-        console.log(row)
+        let wantedPrice=getWantedPrice();
+        let payout=getPayout(wantedPrice);
+        if(document.getElementById("wantedPriceID")){//already inserted to DOM
+            document.getElementById("wantedPriceID").innerHTML='Wanted Price:'+wantedPrice+"£";
+            document.getElementById("PayoudID").innerHTML='Your payout:'+payout+"£";
+            return
+        }
+        var row=getRow();//not in the DOM
         wantedPriceHTML.innerHTML='Wanted Price:'+wantedPrice+"£";
         wantedPriceHTML.className="css-d5w67v";
+        wantedPriceHTML.id="wantedPriceID";
         row.append(wantedPriceHTML);
-        var payout=getPayout(wantedPrice)
         var payoutHTML = document.createElement("span");
+        payoutHTML.id="PayoudID";
         payoutHTML.innerHTML='Your payout:'+payout+"£";
         payoutHTML.className="css-d5w67v";
         row.append(payoutHTML);
@@ -91,10 +96,14 @@
             askPrice.replace(",","");
             lowestAsk=parseInt(lowestAsk);//parse to int to make calculations possible
             askPrice=parseInt(askPrice);
-            console.log(lowestAsk,askPrice);
+            //console.log(lowestAsk,askPrice);
             if(lowestAsk/1.05<askPrice-0.3){
                 console.log(lowestAsk/1.05,askPrice)
                 row.cells[1].lastElementChild.style.backgroundColor="#DAD6D5";
+                row.cells[1].lastElementChild.style.border="inset";
+                row.cells[1].lastElementChild.style.borderRadius="10px";
+                row.cells[1].lastElementChild.style.display="inline-block";
+
             }
         }
     }
@@ -110,13 +119,12 @@
         var span = document.createElement("span");//creating my own element to insert into the dom
         topNavbar.innerHTML=`<button type='button'
         id="checkAllItemsButton"
-        class='chakra-button css-ft0g6z'
-        style='width: 50%;height:0px;min-height: 0px;padding-top:1.5rem;background:none'
-        >Check all items
+        style='width: 50%;color:white;height:100%;font-weight: bold;'
+        >CHECK ALL ITEMS
         </button><button type='button'
         id="checkSingleItemButton"
-        class='chakra-button css-ft0g6z' style='width: 50%;height:0px;min-height: 0px;padding-top:1.5rem;background:none'
-        >Check item</button>"`;
+        style='width: 50%;height:100%;color:white;top:50%;font-weight: bold;'
+        >CHECK ITEM</button>"`;
         var checkAllItems=document.getElementById("checkAllItemsButton");
         var checkSingleItem=document.getElementById("checkSingleItemButton");
         checkAllItems.addEventListener("click",checkAllItemsFunc)
